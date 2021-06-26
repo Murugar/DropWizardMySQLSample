@@ -1,0 +1,43 @@
+version: "3"
+services:
+
+  db:
+    image: mysql:5.7
+    container_name: db
+    restart: always
+    hostname: 127.0.0.1
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: 123456
+      MYSQL_DATABASE: mydb
+      MYSQL_ROOT_HOST: '%'
+    expose: 
+      - '3306'
+    ports:
+      - '3306:3306'
+    networks:
+      - my-network
+
+
+
+  dropwizard2:
+    depends_on:
+      - db
+    restart: always           
+    hostname: 127.0.0.1
+    build: .
+    image: dropwizard2:1.0-SNAPSHOT
+    networks:
+      - my-network
+    ports:
+      - "8080:8080"
+    environment:
+      JDBC_DRIVER: "com.mysql.cj.jdbc.Driver"
+      JDBC_URL: "jdbc:mysql://db:3306/mydb?autoReconnect=true&useSSL=false"
+
+  
+volumes:
+  dropwizard2-volume:
+
+networks:
+  my-network:
